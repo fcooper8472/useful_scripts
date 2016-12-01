@@ -7,7 +7,7 @@ except ImportError:
     print("Py: ParaView module not imported - is ParaView in the python path?")
 
 
-def pvd_to_mp4(sim_dir, path_to_movies, movie_name='movie', representation='Surface'):
+def pvd_to_mp4(sim_dir, path_to_movies, movie_name='movie', representation='Surface', num_regions=0):
 
     ###############################
     # Validate directory and data #
@@ -21,6 +21,12 @@ def pvd_to_mp4(sim_dir, path_to_movies, movie_name='movie', representation='Surf
 
     if not (os.path.isdir(path_to_movies)):
         raise Exception('pvd_to_mp4: Invalid movie directory')
+
+    if representation not in ['Surface', 'Points']:
+        raise Exception('pvd_to_mp4: Representation must be either Surface or Points')
+
+    if num_regions not in [0, 9]:
+        raise Exception('pvd_to_mp4: Currently there is only support for 9 node regions')
 
     # sim_id = os.path.basename(os.path.normpath(sim_dir))
 
