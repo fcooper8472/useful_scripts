@@ -4,7 +4,7 @@ import platform
 try:
     import paraview.simple as pv
 except ImportError:
-    print("Py: immersed_boundary not imported - is ParaView in the python path?")
+    print("Py: ParaView module not imported - is ParaView in the python path?")
 
 
 def pvd_to_mp4(sim_dir, path_to_movies, movie_name='movie', representation='Surface'):
