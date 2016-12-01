@@ -53,7 +53,7 @@ def pvd_to_mp4(sim_dir, path_to_movies, movie_name='movie', representation='Surf
     render_view = pv.GetActiveViewOrCreate('RenderView')
 
     # Change parameters to be how we want them for output
-    render_view.ViewSize = [720, 720]           # Size of output (pixels)
+    render_view.ViewSize = [1920, 1080]         # Size of output (pixels)
     render_view.CenterAxesVisibility = 0        # Remove cross hairs
     render_view.OrientationAxesVisibility = 0   # Remove orientation axes
     render_view.Background = [0.5, 0.5, 0.5]    # Set background colour to 50% grey
@@ -61,6 +61,7 @@ def pvd_to_mp4(sim_dir, path_to_movies, movie_name='movie', representation='Surf
     # Create a unit square (a 3D Box with ZLength set to zero)
     unit_square = pv.Box()
     unit_square.ZLength = 0.0
+    unit_square.YLength = 9.0 / 16.0
     unit_square.Center = [0.5, 0.5, 0.0]
 
     # Show the box in the current render view, and colour it black
@@ -98,8 +99,8 @@ def pvd_to_mp4(sim_dir, path_to_movies, movie_name='movie', representation='Surf
     render_view.CameraPosition = [0.5, 0.5, 1.0]
     render_view.CameraFocalPoint = [0.5, 0.5, 0.0]
 
-    # This parameter sets the 'zoom' and needs fine-tuning: however, 0.5 seems perfect to capture the unit square
-    render_view.CameraParallelScale = 0.5
+    # This parameter sets the 'zoom' and needs fine-tuning by the aspect ratio
+    render_view.CameraParallelScale = 0.5 * 9.0 / 16.0
 
     ##################################
     # Set up and write the animation #
