@@ -90,6 +90,36 @@ def pvd_to_mp4(sim_dir, path_to_movies, movie_name='movie', representation='Surf
                                       7.0, 1.00, 1.00, 1.00,  # RIGHT_BASAL_REGION, white
                                       8.0, 1.00, 1.00, 1.00]  # LAMINA_REGION, white
 
+        cell_regions_lut = pv.GetColorTransferFunction('CellRegions')
+        cell_regions_lut.RGBPoints = [-1.0, 0.0, 0.00, 0.00,  # basal lamina, black
+                                      0.0, 0.00, 0.00, 1.00,  # left region, blue
+                                      1.0, 1.00, 1.00, 1.00,  # centre_region, white
+                                      2.0, 1.00, 0.00, 0.00]  # right_region, red
+
+        # Glyphs for cell region
+        cell_glyphs = pv.Glyph(Input=results_pvd, GlyphType='2D Glyph')
+
+        cell_glyphs.Scalars = ['CELLS', 'Cell Regions']
+        cell_glyphs.ScaleFactor = 0.01
+        cell_glyphs.GlyphMode = 'All Points'
+        cell_glyphs.GlyphType.GlyphType = 'Diamond'
+        cell_glyphs.GlyphType.Filled = 1
+        cell_glyphs.GlyphTransform.Scale = [1.0, 2.0, 1.0]
+
+        cell_glyphs_display = pv.Show(cell_glyphs, render_view)
+        cell_glyphs_display.Opacity = 0.5
+
+        # Glyphs for node region
+        node_glyphs = pv.Glyph(Input=results_pvd, GlyphType='2D Glyph')
+
+        node_glyphs.Scalars = ['POINTS', 'Node Regions']
+        node_glyphs.ScaleFactor = 0.002
+        node_glyphs.GlyphMode = 'All Points'
+        node_glyphs.GlyphType.GlyphType = 'Circle'
+        node_glyphs.GlyphType.Filled = 1
+
+        pv.Show(node_glyphs, render_view)
+
     ###################################
     # Put the camera where we want it #
     ###################################
