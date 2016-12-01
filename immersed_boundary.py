@@ -13,9 +13,6 @@ def pvd_to_mp4(sim_dir, path_to_movies, movie_name='movie', representation='Surf
     # Validate directory and data #
     ###############################
 
-    if sim_dir[-1] != '/':
-        sim_dir += '/'
-
     if not (os.path.isdir(sim_dir)):
         raise Exception('pvd_to_mp4: Invalid simulation directory')
 
@@ -33,7 +30,7 @@ def pvd_to_mp4(sim_dir, path_to_movies, movie_name='movie', representation='Surf
     possible_data_directories = []
     for directory in os.listdir(sim_dir):
         if directory.startswith('results_from_time'):
-            possible_data_directories.append(sim_dir + directory + '/')
+            possible_data_directories.append(os.path.join(sim_dir, directory))
 
     if len(possible_data_directories) == 0:
         raise Exception('pvd_to_mp4: Could not find a "results_from_time_X" directory')
@@ -42,7 +39,7 @@ def pvd_to_mp4(sim_dir, path_to_movies, movie_name='movie', representation='Surf
     data_directory = sorted(possible_data_directories)[-1]
 
     # Get the location of the pvd file
-    pvd_file = data_directory + 'results.pvd'
+    pvd_file = os.path.join(data_directory, 'results.pvd')
     if not(os.path.isfile(pvd_file)):
         raise Exception('pvd_to_mp4: Could not find a pvd data file')
 
