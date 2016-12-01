@@ -74,6 +74,21 @@ def pvd_to_mp4(sim_dir, path_to_movies, movie_name='movie', representation='Surf
     results_pvd_display = pv.Show(results_pvd, render_view)
     results_pvd_display.Representation = representation
 
+    if representation == 'Points' and num_regions == 9:
+        pv.ColorBy(results_pvd_display, ('POINTS', 'Node Regions'))
+        node_regions_lut = pv.GetColorTransferFunction('NodeRegions')
+
+        # Each four digits are: data value, r, g, b (colour)
+        node_regions_lut.RGBPoints = [0.0, 1.00, 0.00, 0.00,  # LEFT_APICAL_REGION, red
+                                      1.0, 1.00, 0.00, 0.00,  # RIGHT_APICAL_REGION, red
+                                      2.0, 1.00, 0.00, 1.00,  # LEFT_PERIAPICAL_REGION, purple
+                                      3.0, 1.00, 0.00, 1.00,  # RIGHT_PERIAPICAL_REGION, purple
+                                      4.0, 0.00, 0.00, 1.00,  # LEFT_LATERAL_REGION, blue
+                                      5.0, 0.00, 0.00, 1.00,  # RIGHT_LATERAL_REGION, blue
+                                      6.0, 1.00, 1.00, 1.00,  # LEFT_BASAL_REGION, white
+                                      7.0, 1.00, 1.00, 1.00,  # RIGHT_BASAL_REGION, white
+                                      8.0, 1.00, 1.00, 1.00]  # LAMINA_REGION, white
+
     ###################################
     # Put the camera where we want it #
     ###################################
