@@ -43,6 +43,9 @@ def pvd_to_mp4(sim_dir, path_to_movies, movie_name='movie', representation='Surf
     if not(os.path.isfile(pvd_file)):
         raise Exception('pvd_to_mp4: Could not find a pvd data file')
 
+    if os.path.getsize(pvd_file) < 1024:
+        raise Exception('pvd_to_mp4: pvd file exists but is < 1kb. Presumably simulation failed to finish as expected.')
+
     full_movie_path = os.path.join(path_to_movies, movie_name + '_' + representation + '.mp4')
 
     ##################################
