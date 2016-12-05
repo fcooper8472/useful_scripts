@@ -56,7 +56,7 @@ def pvd_to_mp4(sim_dir, path_to_movies, movie_name='movie', representation='Surf
     render_view = pv.GetActiveViewOrCreate('RenderView')
 
     # Change parameters to be how we want them for output
-    render_view.ViewSize = [1920, 1080]         # Size of output (pixels)
+    render_view.ViewSize = [1600, 900]          # Size of output (pixels)
     render_view.CenterAxesVisibility = 0        # Remove cross hairs
     render_view.OrientationAxesVisibility = 0   # Remove orientation axes
     render_view.Background = [0.5, 0.5, 0.5]    # Set background colour to 50% grey
