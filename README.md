@@ -1,2 +1,2 @@
-# paraview_scripting
-Automated movie generation for immersed boundary simulations using Chaste
+# Useful Scripts
+A selection of scripts for performing various Chaste-related tasks, including video-generation.
