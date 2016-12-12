@@ -172,12 +172,15 @@ def calculate_image_info(svg_file_path, aspect_ratio):
     :raise if anything other than 1 regex match is found on the first line of the svg file
     :raise if anything other than 2 dimension floats are extracted from the regex match
     """
+    # First get the dimensions of the svg file. We use a regex pattern to look for the height and width attributes
+    regex_pattern = 'width="(\d*\.?\d*)px" height="(\d*\.?\d*)px".*?'
+    dimension_strings = re.findall(regex_pattern, open(svg_file_path).readline())
 
     if len(dimension_strings) != 1:
         raise Exception('svg_to_webm: Did not successfully extract svg dimensions from ' + svg_file_path)
 
     # Convert the dimension string to two floats, and validate
-    dimensions = [float(s) for s in dimension_strings[0].split()]
+    dimensions = [float(s) for s in dimension_strings[0]]
     if len(dimensions) != 2:
         raise Exception('svg_to_webm: Did not successfully extract svg dimensions from ' + svg_file_path)
 
