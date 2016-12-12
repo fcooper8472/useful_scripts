@@ -95,18 +95,25 @@ def svg_to_webm(sim_dir, webm_name='results.webm', webm_aspect_ratio=1.0, webm_d
     #   -f image2          Set the convert format (image sequence to video)
     #   -i %04d.png        Input expected as dir/results.####.png, the output from WriteAnimation above
     #   -c:v libvpx-vp9    Video codec to use is vp9
+    #   -tile-columns 6    Encode in 6 columns to enable decoding using multiple threads
+    #   -frame-parallel 1  Allow decoding using multiple threads
     #   -lossless', '1'    Set video quality to lossless
     #   -y name.webm       Output directory and name
+    ffmpeg_command = ['ffmpeg',
+                      '-v', '0',
+                      '-r', str(frame_rate),
+                      '-f', 'image2',
+                      '-i', '%04d.png',
+                      '-c:v', 'libvpx-vp9',
+                      '-tile-columns', '6',
+                      '-frame-parallel', '1',
+                      '-lossless', '1',
+                      '-y', webm_name]
+
     if print_progress:
-        print('svg_to_webm: Creating webm: ' + webm_name)
-    subprocess.call(['ffmpeg',
-                     '-v', '0',
-                     '-r', str(frame_rate),
-                     '-f', 'image2',
-                     '-i', '%04d.png',
-                     '-c:v', 'libvpx-vp9',
-                     '-lossless', '1',
-                     '-y', webm_name], cwd=sim_dir)
+        print('svg_to_webm: Creating webm: ' + ' '.join(ffmpeg_command))
+
+    subprocess.call(ffmpeg_command, cwd=sim_dir)
 
     # Raise exception if the webm file is not generated as expected
     if not os.path.isfile(os.path.join(sim_dir, webm_name)):
