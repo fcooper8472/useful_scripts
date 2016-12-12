@@ -85,9 +85,9 @@ def svg_to_webm(sim_dir, webm_name='results.webm', webm_aspect_ratio=1.0, webm_d
         if print_progress:
             print('svg_to_webm: Archived svg files to svg_arch.tar.gz')
 
-    # Set how long you want the video to be (in seconds), and set the frame rate accordingly
+    # Set how long you want the video to be (in seconds), and set the frame rate accordingly, with a minimum of 1.0
     png_files = list_files_of_type(path_name=sim_dir, extension='.png')
-    frame_rate = float(len(png_files)) / webm_duration
+    frame_rate = max(float(len(png_files)) / webm_duration, 1.0)
 
     # Send the subprocess call to run ffmpeg. Parameters:
     #   -v 0               Suppress console output so as not to clutter the terminal
