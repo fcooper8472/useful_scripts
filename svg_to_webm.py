@@ -144,7 +144,7 @@ def svg_to_webm(sim_dir, webm_name='results.webm', webm_aspect_ratio=1.0, webm_d
     for res_file in os.listdir(sim_dir):
         if not (res_file.endswith('.webm') or res_file.endswith('.tar.gz') or res_file.startswith('.')):
             res_files.append(res_file)
-    print(res_files)
+
     if len(res_files) > 0:
         subprocess.call(['tar', '-zcf', 'res_arch.tar.gz', '--remove-files'] + res_files, cwd=sim_dir)
         if print_progress:
