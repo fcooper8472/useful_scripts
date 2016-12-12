@@ -2,15 +2,35 @@ import os
 import re
 import subprocess
 
+# First, check that inkscape and ffmpeg are installed
+try:
+    subprocess.call(['ffmpeg', '-version'], stdout=open(os.devnull, 'w'))
+except OSError as e:
+    raise ImportError('svg_to_webm: ffmpeg does not seem to be installed: ' + str(e))
+try:
+    subprocess.call(['inkscape', '-V'], stdout=open(os.devnull, 'w'))
+except OSError as e:
+    raise ImportError('svg_to_webm: inkscape does not seem to be installed: ' + str(e))
 
-def svg_to_webm(sim_dir, webm_name='results.webm', webm_aspect_ratio=1.0, webm_duration=15.0):
 
-    # First, check that ffmpeg is installed
-    ffmpeg_version, ffmpeg_errors = subprocess.Popen(['ffmpeg', '-version'], stdout=subprocess.PIPE).communicate()
-    if not ffmpeg_version.startswith('ffmpeg version'):
-        raise Exception('svg_to_webm: ffmpeg does not seem to be installed: ' + ffmpeg_version)
+def svg_to_webm(sim_dir, webm_name='results.webm', webm_aspect_ratio=1.0, webm_duration=15.0, print_progress=False):
+    """ Convert a sequence of svg files to a webm movie via a sequence of png files
 
-    # Validate input
+    :param sim_dir: the directory containing the simulation output
+    :param webm_name: file name for the webm (default 'results.webm')
+    :param webm_aspect_ratio: required aspect ratio for the webm (default 1.0)
+    :param webm_duration: required duration in seconds for the webm (default 15.0)
+    :param print_progress: whether to print running trace of this function (default False)
+    :return: nothing
+
+    :raise Exception: if sim_dir is not a valid directory
+    :raise Exception: if webm_aspect_ratio is < 1.0
+    :raise Exception: if webm_duration is < 1.0
+    :raise Exception: if no svg files found in sim_dir
+    :raise Exception: if ffmpeg does not generate webm file
+    :raise Exception: if ffmpeg does not generate valid webm file (at least 1kb in size)
+    """
+    # Validate and process input
     if not (os.path.isdir(sim_dir)):
         raise Exception('svg_to_webm: Invalid simulation directory: ' + sim_dir)
 
