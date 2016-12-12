@@ -51,6 +51,8 @@ def svg_to_webm(sim_dir, webm_name='results.webm', webm_aspect_ratio=1.0, webm_d
 
     if svg_archive_exists:
         subprocess.call(['tar', '-zxf', 'svg_arch.tar.gz', '--overwrite'], cwd=sim_dir)
+        if print_progress:
+            print('svg_to_webm: Extracting svg files from archive svg_arch.tar.gz')
 
     svg_files = list_files_of_type(path_name=sim_dir, extension='.svg')
 
@@ -60,19 +62,28 @@ def svg_to_webm(sim_dir, webm_name='results.webm', webm_aspect_ratio=1.0, webm_d
 
     # Use the first svg file to calculate information necessary to convert and crop the svg to png
     file_info = calculate_image_info(svg_file_path=os.path.join(sim_dir, svg_files[0]), aspect_ratio=webm_aspect_ratio)
-
-    print(file_info)
+    if print_progress:
+        print('svg_to_webm: Calculated file information: ' + str(file_info))
 
     # Convert each svg to png
+    if print_progress:
+        print('svg_to_webm: Converting svg to png...')
     for idx, svg_file in enumerate(svg_files):
         svg_to_png(path_to_files=sim_dir, file_name=svg_file, file_info=file_info, index=idx)
-        print('Converted svg ' + str(idx) + ' of ' + str(len(svg_files)))
+        if print_progress:
+            print('\t' + str(idx + 1) + ' of ' + str(len(svg_files)))
+    if print_progress:
+        print('\t... finished converting svg to png.')
 
     # Tidy up: Remove svg files, adding them to an archive if they are not already archived
     if svg_archive_exists:
         subprocess.call(['rm'] + svg_files, cwd=sim_dir)
+        if print_progress:
+            print('svg_to_webm: Removed svg files')
     else:
         subprocess.call(['tar', '-zcf', 'svg_arch.tar.gz', '--remove-files'] + svg_files, cwd=sim_dir)
+        if print_progress:
+            print('svg_to_webm: Archived svg files to svg_arch.tar.gz')
 
     # Set how long you want the video to be (in seconds), and set the frame rate accordingly
     png_files = list_files_of_type(path_name=sim_dir, extension='.png')
@@ -86,6 +97,8 @@ def svg_to_webm(sim_dir, webm_name='results.webm', webm_aspect_ratio=1.0, webm_d
     #   -c:v libvpx-vp9    Video codec to use is vp9
     #   -lossless', '1'    Set video quality to lossless
     #   -y name.webm       Output directory and name
+    if print_progress:
+        print('svg_to_webm: Creating webm: ' + webm_name)
     subprocess.call(['ffmpeg',
                      '-v', '0',
                      '-r', str(frame_rate),
@@ -104,13 +117,20 @@ def svg_to_webm(sim_dir, webm_name='results.webm', webm_aspect_ratio=1.0, webm_d
     if os.path.getsize(os.path.join(sim_dir, webm_name)) < 1024:
         raise Exception('svg_to_webm: webm not generated as expected')
 
+    if print_progress:
+        print('\t... finished creating webm: ' + webm_name)
+
     # Tidy up: Delete all png files
     subprocess.call(['rm'] + png_files, cwd=sim_dir)
+    if print_progress:
+        print('svg_to_webm: Removed png files')
 
     # Tidy up: compress any vtu and pvd files, if they exist
     vtu_files = list_files_of_type(sim_dir, '.vtu') + list_files_of_type(sim_dir, '.pvd')
     if len(vtu_files) > 0:
         subprocess.call(['tar', '-zcf', 'vtu_arch.tar.gz', '--remove-files'] + vtu_files, cwd=sim_dir)
+        if print_progress:
+            print('svg_to_webm: Archived vtu and pvd files')
 
     # Tidy up: compress any other results files, if they exist
     res_files = []
@@ -120,6 +140,8 @@ def svg_to_webm(sim_dir, webm_name='results.webm', webm_aspect_ratio=1.0, webm_d
     print(res_files)
     if len(res_files) > 0:
         subprocess.call(['tar', '-zcf', 'res_arch.tar.gz', '--remove-files'] + res_files, cwd=sim_dir)
+        if print_progress:
+            print('svg_to_webm: Archived other results files')
 
 
 # Helper function for svg_to_webm: list all files with a particular extension in the simulation directory
