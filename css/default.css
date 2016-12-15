@@ -1,7 +1,68 @@
+* {
+    border: solid;
+    border-color: red;
+}
+
 tbody tr:nth-child(odd) {
    background-color: #fff;
 }
 
 tbody tr:nth-child(even) {
    background-color: #ebfaed;
+}
+
+tr {
+    height: 40px;
+}
+
+td {
+    vertical-align: middle;
+}
+
+div.main {
+    width: 60%;
+    margin: auto;
+}
+
+div.background {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    margin: auto;
+}
+
+div.video {
+    width: 70%;
+    height: 70%;
+    background: #000;
+
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    margin: auto;
+}
+
+video.full {
+    width: 100%;
+    margin: auto;
+}
+
+td.cell_header {
+    text-align: center;
+    font-weight: bold;
+}
+
+td.cell_centre {
+    text-align: center;
+}
+
+td.cell_right {
+    text-align: right;
+}
+
+td.cell_unchanging {
+    color: #888;
 }
