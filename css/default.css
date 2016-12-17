@@ -1,68 +1,70 @@
-* {
-    border: solid;
-    border-color: red;
+/* Remove default values to ensure consistency between browsers */
+body {
+    margin: 0;
+    padding: 0;
 }
 
+/* Odd rows of table body white */
 tbody tr:nth-child(odd) {
    background-color: #fff;
 }
 
+/* Even rows of table body light green */
 tbody tr:nth-child(even) {
    background-color: #ebfaed;
 }
 
+/* Slightly larger default row height in table */
 tr {
     height: 40px;
 }
 
+/* Middle-align text in table cells */
 td {
     vertical-align: middle;
 }
 
-div.main {
-    width: 60%;
-    margin: auto;
-}
-
-div.background {
-    width: 100%;
-    height: 100%;
-    background: #000;
-    margin: auto;
-}
-
-div.video {
-    width: 70%;
-    height: 70%;
-    background: #000;
-
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    margin: auto;
-}
-
-video.full {
-    width: 100%;
-    margin: auto;
-}
-
+/* Class selector for table cells in the header row */
 td.cell_header {
     text-align: center;
     font-weight: bold;
 }
 
+/* Class selector for table cells that should be centre-aligned */
 td.cell_centre {
     text-align: center;
 }
 
+/* Class selector for table cells that should be right-aligned */
 td.cell_right {
     text-align: right;
 }
 
+/* Class selector for cells where whole column is unchanged so text is greyed-out */
 td.cell_unchanging {
     color: #888;
+}
+
+/* Class selector for div containing 'main' content (including Chaste results tables) */
+div.main {
+    width: 60%;
+    margin: auto;
+    padding: 5vh 0;
+}
+
+/* Class selector for div intended to contain a single large video in the middle */
+div.video {
+    display:flex;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+}
+
+/* Large video class, constrained to fit most of box containing it */
+video {
+    height:auto;
+    width:auto;
+    max-width: 85vw;
+    max-height: 85vh;
+    margin: auto;
 }
