@@ -9,19 +9,21 @@ def print_usage():
     """ Prints usage for this script """
     print('Generate a pdf diff of latex file with a previous version.')
     print('Called with either a date in the past or a git SHA1 hash:')
-    print('\t' + sys.argv[0] + '<file_name.tex> YYYY-MM-DD')
-    print('\t' + sys.argv[0] + '<file_name.tex> <40-digit git SHA1 hash>')
+    print('\t' + sys.argv[0] + ' <file_name.tex> YYYY-MM-DD')
+    print('\t' + sys.argv[0] + ' <file_name.tex> <40-digit git SHA1 hash>')
 
 # Expecting just one additional argument
 if len(sys.argv) != 3:
     quit(print_usage())
 
-# Expecting either date (length 10) or SHA1 hash (length 40)
+# Expecting a tex file
 if not sys.argv[1].endswith('.tex'):
+    print("File " + sys.argv[1] + " does not appear to be a .tex file.")
     quit(print_usage())
 
 # Expecting either date (length 10) or SHA1 hash (length 40)
 if not os.path.isfile(sys.argv[1]):
+    print("File " + sys.argv[1] + " is not a valid file.")
     quit(print_usage())
 
 # Expecting either date (length 10) or SHA1 hash (length 40)
@@ -37,19 +39,34 @@ try:
 except OSError as e:
     quit('latexdiff does not seem to be installed: try sudo apt-get install latexdiff')
 
-# Define all necessary files
+# Identify git repo top level directory
+repo_dir = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).strip()
+if not os.path.isdir(repo_dir):
+    print("Directory " + repo_dir + " is not a valid directory.")
+    quit(print_usage())
+
+if repo_dir not in os.path.abspath(sys.argv[1]):
+    print("Repo " + repo_dir + " does not seem to contain " + sys.argv[1])
+    quit(print_usage())
+
+# Define all necessary files and paths
+rel_to_repo = os.path.abspath(sys.argv[1]).replace(repo_dir, '').replace(sys.argv[1], '').strip('/')
+
 file_tex = sys.argv[1]
 file_old = file_tex.replace('.tex', '.OLD')
 file_dif = file_tex.replace('.tex', '_diff.tex')
-log_file = 'log'
+log_file = file_tex.replace(sys.argv[1], 'log')
+
+# For the git part, we work relative to the git repo top level directory
+os.chdir(repo_dir)
 
 # Generate log of revisions to tex file
 print('Generating list of revisions that changed ' + file_tex + '...')
-with open(log_file, 'w') as f:
-    subprocess.call(['git', 'log', '--follow', file_tex], stdout=f)
+with open(os.path.join(rel_to_repo, log_file), 'w') as f:
+    subprocess.call(['git', 'log', '--follow', os.path.join(rel_to_repo, file_tex)], stdout=f)
 
 # Read log contents into list
-with open(log_file, 'r') as f:
+with open(os.path.join(rel_to_repo, log_file), 'r') as f:
     log_contents = f.readlines()
 
 # Parse log contents to get list of SHA1 hashes and date strings
@@ -102,7 +119,10 @@ else:
 # Generate file with determined hash
 print('Getting revision ' + correct_hash + ' from git repo...')
 with open(file_old, 'w') as f:
-    subprocess.call(['git', 'show', correct_hash + ':' + file_tex], stdout=f)
+    subprocess.call(['git', 'show', correct_hash + ':' + os.path.join(rel_to_repo, file_tex)], stdout=f)
+
+# For the latex part, we work relative to the tex file directory
+os.chdir(os.path.join(repo_dir, rel_to_repo))
 
 # Generate diff tex file
 print('Generating latex diff file...')
@@ -113,10 +133,20 @@ with open(file_dif, 'w') as f:
 if os.path.isfile(file_dif.replace('.tex', '.pdf')):
     subprocess.call(['rm', file_dif.replace('.tex', '.pdf')])
 
-# todo: compile bibtex as well, if present
+# Find the bib file if it's there
+bib_files = []
+for my_file in os.listdir('.'):
+    if my_file.endswith('.bib'):
+        bib_files.append(my_file)
+
+if len(bib_files) > 1:
+    print('Warning: more than one bib file found: not compiling references')
 
 # Compile pdf
 print('Generating pdf diff...')
+subprocess.call(['pdflatex', file_dif])#, stdout=devnull)
+if len(bib_files) == 1:
+    subprocess.call(['bibtex', bib_files[0]], stdout=devnull)
 subprocess.call(['pdflatex', file_dif], stdout=devnull)
 subprocess.call(['pdflatex', file_dif], stdout=devnull)
 subprocess.call(['pdflatex', file_dif], stdout=devnull)
