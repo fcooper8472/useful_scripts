@@ -118,7 +118,7 @@ else:
 
 # Generate file with determined hash
 print('Getting revision ' + correct_hash + ' from git repo...')
-with open(file_old, 'w') as f:
+with open(os.path.join(rel_to_repo, file_old), 'w') as f:
     subprocess.call(['git', 'show', correct_hash + ':' + os.path.join(rel_to_repo, file_tex)], stdout=f)
 
 # For the latex part, we work relative to the tex file directory
@@ -134,19 +134,16 @@ if os.path.isfile(file_dif.replace('.tex', '.pdf')):
     subprocess.call(['rm', file_dif.replace('.tex', '.pdf')])
 
 # Find the bib file if it's there
-bib_files = []
+num_bib_files = 0
 for my_file in os.listdir('.'):
     if my_file.endswith('.bib'):
-        bib_files.append(my_file)
-
-if len(bib_files) > 1:
-    print('Warning: more than one bib file found: not compiling references')
+        num_bib_files += 1
 
 # Compile pdf
 print('Generating pdf diff...')
-subprocess.call(['pdflatex', file_dif])#, stdout=devnull)
-if len(bib_files) == 1:
-    subprocess.call(['bibtex', bib_files[0]], stdout=devnull)
+subprocess.call(['pdflatex', file_dif], stdout=devnull)
+if num_bib_files > 0:
+    subprocess.call(['bibtex', file_dif.replace('.tex', '.aux')], stdout=devnull)
 subprocess.call(['pdflatex', file_dif], stdout=devnull)
 subprocess.call(['pdflatex', file_dif], stdout=devnull)
 subprocess.call(['pdflatex', file_dif], stdout=devnull)
