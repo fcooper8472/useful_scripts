@@ -12,7 +12,7 @@ def print_usage():
     print('\t' + sys.argv[0] + ' <file_name.tex> YYYY-MM-DD')
     print('\t' + sys.argv[0] + ' <file_name.tex> <40-digit git SHA1 hash>')
 
-# Expecting just one additional argument
+# Expecting two additional arguments
 if len(sys.argv) != 3:
     quit(print_usage())
 
@@ -157,7 +157,10 @@ if os.path.getsize(file_dif.replace('.tex', '.pdf')) < 1024:
 # Tidy up generated files
 print('Tidying up...')
 subprocess.call(['rm', file_old, file_dif, log_file])
-subprocess.call(['rm', file_dif.replace('.tex', '.aux'), file_dif.replace('.tex', '.log')])
+
+for my_file in os.listdir('.'):
+    if my_file.startswith(file_dif.replace('.tex', '')) and not my_file.endswith('.pdf'):
+        subprocess.call(['rm', my_file])
 
 # Close devnull
 devnull.close()
