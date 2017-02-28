@@ -146,7 +146,6 @@ if num_bib_files > 0:
     subprocess.call(['bibtex', file_dif.replace('.tex', '.aux')], stdout=devnull)
 subprocess.call(['pdflatex', file_dif], stdout=devnull)
 subprocess.call(['pdflatex', file_dif], stdout=devnull)
-subprocess.call(['pdflatex', file_dif], stdout=devnull)
 
 # Check that a valid pdf was created by pdflatex
 if not os.path.isfile(file_dif.replace('.tex', '.pdf')):
