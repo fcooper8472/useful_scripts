@@ -127,7 +127,7 @@ os.chdir(os.path.join(repo_dir, rel_to_repo))
 # Generate diff tex file
 print('Generating latex diff file...')
 with open(file_dif, 'w') as f:
-    subprocess.call(['latexdiff', file_old, file_tex], stdout=f, stderr=devnull)
+    subprocess.call(['latexdiff', '--packages=cleveref,hyperref', file_old, file_tex], stdout=f, stderr=devnull)
 
 # If pdf already exists, delete it first
 if os.path.isfile(file_dif.replace('.tex', '.pdf')):
