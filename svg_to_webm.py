@@ -113,7 +113,7 @@ def svg_to_webm(sim_dir, webm_name='results.webm', webm_aspect_ratio=1.0, webm_d
     if print_progress:
         print('svg_to_webm: Creating webm: ' + ' '.join(ffmpeg_command))
 
-    subprocess.call(ffmpeg_command, cwd=sim_dir, stdout=open(os.devnull, 'w'))
+    subprocess.call(ffmpeg_command, cwd=sim_dir, stdout=open(os.devnull, 'w'), stderr=open(os.devnull, 'w'))
 
     # Raise exception if the webm file is not generated as expected
     if not os.path.isfile(os.path.join(sim_dir, webm_name)):
