@@ -1,7 +1,6 @@
 import csv
 import os
 import random
-import re
 import sys
 import subprocess
 
@@ -22,8 +21,8 @@ if not os.path.isfile(csv_filename):
     print('Expecting a valid csv file as command line argument.')
     quit(print_usage())
 
-anonymous_tex = open('latex/anonymous_responses.tex', 'w')
-plain_tex = open('latex/plain_responses.tex', 'w')
+anonymous_tex = open('anonymous_responses.tex', 'w')
+plain_tex = open('plain_responses.tex', 'w')
 
 tex_head = """\documentclass[11pt, a4paper]{article}
 
@@ -127,6 +126,16 @@ plain_tex.write("""\end{document}""")
 anonymous_tex.close()
 plain_tex.close()
 
-subprocess.call(['pdflatex', 'latex/anonymous_responses.tex'], stdout=open(os.devnull, 'w'))
-subprocess.call(['pdflatex', 'latex/plain_responses.tex'], stdout=open(os.devnull, 'w'))
-# subprocess.call(['pdflatex', 'latex/responses.tex'], stdout=open(os.devnull, 'w'))
+subprocess.call(['pdflatex', 'anonymous_responses.tex'], stdout=open(os.devnull, 'w'))
+subprocess.call(['pdflatex', 'plain_responses.tex'], stdout=open(os.devnull, 'w'))
+
+# Clean up
+for local_file in os.listdir(os.getcwd()):
+    if local_file.endswith('.aux'):
+        subprocess.call(['rm', local_file])
+    elif local_file.endswith('.synctex.gz'):
+        subprocess.call(['rm', local_file])
+    elif local_file.endswith('.log'):
+        subprocess.call(['rm', local_file])
+    elif local_file.endswith('.tex'):
+        subprocess.call(['rm', local_file])
