@@ -4,11 +4,11 @@ import subprocess
 
 # First, check that inkscape and ffmpeg are installed
 try:
-    subprocess.call(['ffmpeg', '-version'], stdout=open(os.devnull, 'w'))
+    subprocess.call(['ffmpeg', '-version'], stdout=open(os.devnull, 'w'), stderr=open(os.devnull, 'w'))
 except OSError as e:
     raise ImportError('svg_to_webm: ffmpeg does not seem to be installed: ' + str(e))
 try:
-    subprocess.call(['inkscape', '-V'], stdout=open(os.devnull, 'w'))
+    subprocess.call(['inkscape', '-V'], stdout=open(os.devnull, 'w'), stderr=open(os.devnull, 'w'))
 except OSError as e:
     raise ImportError('svg_to_webm: inkscape does not seem to be installed: ' + str(e))
 
@@ -150,6 +150,9 @@ def svg_to_webm(sim_dir, webm_name='results.webm', webm_aspect_ratio=1.0, webm_d
         if print_progress:
             print('svg_to_webm: Archived other results files')
 
+    # Reset terminal
+    os.system('stty sane')
+
 
 def list_files_of_type(path_name, extension):
     """ Return a sorted list of files in a directory, with a specific extension
@@ -224,7 +227,7 @@ def svg_to_png(path_to_files, file_name, file_info, index):
     subprocess.call(['inkscape', '-z',
                      '-e', str(index).zfill(4) + '.png',
                      '-a', file_info['crop_string'],
-                     file_name], cwd=path_to_files, stdout=open(os.devnull, 'w'))
+                     file_name], cwd=path_to_files, stdout=open(os.devnull, 'w'), stderr=open(os.devnull, 'w'))
 
 if __name__ == '__main__':
     quit('Call svg_to_webm.svg_to_webm()')
