@@ -47,7 +47,7 @@ td.cell_unchanging {
 
 /* Class selector for div containing 'main' content (including Chaste results tables) */
 div.main {
-    width: 60%;
+    width: 85%;
     margin: auto;
     padding: 5vh 0;
 }
