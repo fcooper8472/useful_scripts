@@ -46,47 +46,55 @@ def svg_to_webm(sim_dir, webm_name='results.webm', webm_aspect_ratio=1.0, webm_d
     # Set GZIP environment variable to give max compression in tar stages
     os.environ['GZIP'] = '-9'
 
-    # Check whether an svg archive exists.  If it does, extract it.  Then, list all svg files in the directory
-    svg_archive_exists = 'svg_arch.tar.gz' in os.listdir(sim_dir)
+    png_files = list_files_of_type(path_name=sim_dir, extension='.png')
 
-    if svg_archive_exists:
-        subprocess.call(['tar', '-zxf', 'svg_arch.tar.gz', '--overwrite'], cwd=sim_dir)
+    # "New" behaviour is to pre-convert the png files, so they may already exist.  Only convert them if necessary
+    if len(png_files) == 0:
+
+        # Check whether an svg archive exists.  If it does, extract it.  Then, list all svg files in the directory
+        svg_archive_exists = 'svg_arch.tar.gz' in os.listdir(sim_dir)
+
+        if svg_archive_exists:
+            subprocess.call(['tar', '-zxf', 'svg_arch.tar.gz', '--overwrite'], cwd=sim_dir)
+            if print_progress:
+                print('svg_to_webm: Extracting svg files from archive svg_arch.tar.gz')
+
+        svg_files = list_files_of_type(path_name=sim_dir, extension='.svg')
+
+        # If there aren't any svg files at this point, something has gone wrong
+        if len(svg_files) == 0:
+            raise Exception('svg_to_webm: No svg files found in ' + sim_dir)
+
+        # Use the first svg file to calculate information necessary to convert and crop the svg to png
+        file_info = calculate_image_info(svg_file_path=os.path.join(sim_dir, svg_files[0]),
+                                         aspect_ratio=webm_aspect_ratio)
+
         if print_progress:
-            print('svg_to_webm: Extracting svg files from archive svg_arch.tar.gz')
+            print('svg_to_webm: Calculated file information: ' + str(file_info))
 
-    svg_files = list_files_of_type(path_name=sim_dir, extension='.svg')
-
-    # If there aren't any svg files at this point, something has gone wrong
-    if len(svg_files) == 0:
-        raise Exception('svg_to_webm: No svg files found in ' + sim_dir)
-
-    # Use the first svg file to calculate information necessary to convert and crop the svg to png
-    file_info = calculate_image_info(svg_file_path=os.path.join(sim_dir, svg_files[0]), aspect_ratio=webm_aspect_ratio)
-    if print_progress:
-        print('svg_to_webm: Calculated file information: ' + str(file_info))
-
-    # Convert each svg to png
-    if print_progress:
-        print('svg_to_webm: Converting svg to png...')
-    for idx, svg_file in enumerate(svg_files):
-        svg_to_png(path_to_files=sim_dir, file_name=svg_file, file_info=file_info, index=idx)
+        # Convert each svg to png
         if print_progress:
-            print('\t' + str(idx + 1) + ' of ' + str(len(svg_files)))
-    if print_progress:
-        print('\t... finished converting svg to png.')
+            print('svg_to_webm: Converting svg to png...')
+        for idx, svg_file in enumerate(svg_files):
+            svg_to_png(path_to_files=sim_dir, file_name=svg_file, file_info=file_info, index=idx)
+            if print_progress:
+                print('\t' + str(idx + 1) + ' of ' + str(len(svg_files)))
+        if print_progress:
+            print('\t... finished converting svg to png.')
 
-    # Tidy up: Remove svg files, adding them to an archive if they are not already archived
-    if svg_archive_exists:
-        subprocess.call(['rm'] + svg_files, cwd=sim_dir)
-        if print_progress:
-            print('svg_to_webm: Removed svg files')
-    else:
-        subprocess.call(['tar', '-zcf', 'svg_arch.tar.gz', '--remove-files'] + svg_files, cwd=sim_dir)
-        if print_progress:
-            print('svg_to_webm: Archived svg files to svg_arch.tar.gz')
+        # Tidy up: Remove svg files, adding them to an archive if they are not already archived
+        if svg_archive_exists:
+            subprocess.call(['rm'] + svg_files, cwd=sim_dir)
+            if print_progress:
+                print('svg_to_webm: Removed svg files')
+        else:
+            subprocess.call(['tar', '-zcf', 'svg_arch.tar.gz', '--remove-files'] + svg_files, cwd=sim_dir)
+            if print_progress:
+                print('svg_to_webm: Archived svg files to svg_arch.tar.gz')
+
+        png_files = list_files_of_type(path_name=sim_dir, extension='.png')
 
     # Set how long you want the video to be (in seconds), and set the frame rate accordingly, with a minimum of 1.0
-    png_files = list_files_of_type(path_name=sim_dir, extension='.png')
     frame_rate = max(float(len(png_files)) / webm_duration, 1.0)
 
     # Send the subprocess call to run ffmpeg. Parameters:
