@@ -56,6 +56,7 @@ def png_to_mp4(sim_dir, mp4_name='results.mp4', mp4_duration=15.0, print_progres
                       '-f', 'image2',
                       '-i', '%04d.png',
                       '-c:v', 'libx264',
+                      '-pix_fmt', 'yuv420p',
                       '-crf', '0',
                       '-preset', 'slow',
                       '-y', mp4_name]
