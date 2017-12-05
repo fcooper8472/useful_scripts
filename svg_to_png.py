@@ -93,7 +93,10 @@ def get_sorted_list_of_svg_in_dir(svg_dir):
     list_of_svg = []
     for file_name in list_of_files:
         if file_name.endswith('.svg'):
-            list_of_svg.append(file_name)
+            # Verify the svg file is valid by finding the closing xml tag
+            with open(os.path.join(svg_dir, file_name), 'r') as svg_file:
+                if '</svg>' in svg_file.read():
+                    list_of_svg.append(file_name)
 
     return sorted(list_of_svg)
 
