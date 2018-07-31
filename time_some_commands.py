@@ -7,10 +7,16 @@ make_core_times = []
 make_mesh_times = []
 test_mesh_times = []
 
-num_cores = 3
+num_cores = '-j3'
 num_runs = 1
 
 for i in range(num_runs):
+
+    # Reset environment
+    system('unset CC')
+    system('unset CXX')
+    system('unset PETSC_DIR')
+    system('unset PETSC_ARCH')
 
     # Reset build directory
     system('rm CMakeCache.txt')
@@ -23,23 +29,23 @@ for i in range(num_runs):
 
     # Time building libraries
     start = time()
-    system('make -j%s chaste_core' % num_cores)
+    system('make %s chaste_core' % num_cores)
     make_core_times.append(time() - start)
 
     # Time building tests
     start = time()
-    system('make -j%s mesh' % num_cores)
+    system('make %s mesh' % num_cores)
     make_mesh_times.append(time() - start)
 
     # Time running tests
     start = time()
-    system('ctest -j%s -L Continuous_mesh' % num_cores)
+    system('ctest %s -L mesh -E Parallel' % num_cores)
     test_mesh_times.append(time() - start)
 
 
 with open('times.csv', 'w') as f:
-    f.write(',mean,std')
-    f.write('configure,%s,%s' % (mean(cmake_times), std(cmake_times)))
-    f.write('build_libs,%s,%s' % (mean(make_core_times), std(make_core_times)))
-    f.write('build_tests,%s,%s' % (mean(make_mesh_times), std(make_mesh_times)))
-    f.write('run_tests,%s,%s' % (mean(test_mesh_times), std(test_mesh_times)))
+    f.write(',mean,std\n')
+    f.write('configure,%s,%s\n' % (mean(cmake_times), std(cmake_times)))
+    f.write('build_libs,%s,%s\n' % (mean(make_core_times), std(make_core_times)))
+    f.write('build_tests,%s,%s\n' % (mean(make_mesh_times), std(make_mesh_times)))
+    f.write('run_tests,%s,%s\n' % (mean(test_mesh_times), std(test_mesh_times)))
