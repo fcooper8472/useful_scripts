@@ -1,5 +1,5 @@
 from numpy import mean, std
-from os import system
+from os import environ, system
 from time import time
 
 cmake_times = []
@@ -13,10 +13,10 @@ num_runs = 1
 for i in range(num_runs):
 
     # Reset environment
-    system('unset CC')
-    system('unset CXX')
-    system('unset PETSC_DIR')
-    system('unset PETSC_ARCH')
+    environ['CC'] = ""
+    environ['CXX'] = ""
+    environ['PETSC_DIR'] = ""
+    environ['PETSC_ARCH'] = ""
 
     # Reset build directory
     system('rm CMakeCache.txt')
