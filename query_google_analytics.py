@@ -4,8 +4,8 @@ from apiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 
 SCOPES = ['https://www.googleapis.com/auth/analytics.readonly']
-KEY_FILE_LOCATION = '/users/ferper/Private/mythic-byway-271219-f2fc9fdcf89e.json'
-VIEW_ID = '195779635'
+KEY_FILE_LOCATION = '/users/ferper/Private/dotted-embassy-271317-3adc0dd0d7db.json'
+VIEW_ID = '187453103'
 
 
 def initialize_analyticsreporting():
