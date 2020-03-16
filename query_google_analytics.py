@@ -1,11 +1,17 @@
 import json
+import sys
 
 from apiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 
+
 SCOPES = ['https://www.googleapis.com/auth/analytics.readonly']
 KEY_FILE_LOCATION = '/users/ferper/Private/dotted-embassy-271317-3adc0dd0d7db.json'
 VIEW_ID = '187453103'
+
+START_DATE = '30daysAgo'
+if len(sys.argv) > 1:
+    START_DATE = sys.argv[1]
 
 
 def initialize_analyticsreporting():
@@ -36,7 +42,7 @@ def get_report(analytics):
             'reportRequests': [
                 {
                     'viewId': VIEW_ID,
-                    'dateRanges': [{'startDate': '30daysAgo', 'endDate': 'today'}],
+                    'dateRanges': [{'startDate': START_DATE, 'endDate': 'today'}],
                     'metrics': [{'expression': 'ga:users'}, {'expression': 'ga:sessions'}],
                     'dimensions': [{'name': 'ga:country'}]
                 }]
@@ -87,7 +93,7 @@ def print_response(response):
                     elif metricHeader.get('name') == 'ga:sessions':
                         json_data['sessions_by_country'][json_country] = json_value
 
-    with open('/fs/website/people/fergus.cooper/google_analytics_data.json', 'w') as outfile:
+    with open(f'/fs/website/people/fergus.cooper/google_analytics_data_{START_DATE}.json', 'w') as outfile:
         json.dump(json_data, outfile)
 
 
