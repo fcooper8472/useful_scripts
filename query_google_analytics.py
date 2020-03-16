@@ -37,7 +37,7 @@ def get_report(analytics):
                 {
                     'viewId': VIEW_ID,
                     'dateRanges': [{'startDate': '30daysAgo', 'endDate': 'today'}],
-                    'metrics': [{'expression': 'ga:sessions'}],
+                    'metrics': [{'expression': 'ga:users'}, {'expression': 'ga:sessions'}],
                     'dimensions': [{'name': 'ga:country'}]
                 }]
         }
@@ -53,32 +53,39 @@ def print_response(response):
 
     json_data = {}
 
-
     for report in response.get('reports', []):
 
-        columnHeader = report.get('columnHeader', {})
-        dimensionHeaders = columnHeader.get('dimensions', [])
-        metricHeaders = columnHeader.get('metricHeader', {}).get('metricHeaderEntries', [])
+        column_header = report.get('columnHeader', {})
+        dimension_headers = column_header.get('dimensions', [])
+        metric_headers = column_header.get('metricHeader', {}).get('metricHeaderEntries', [])
 
-        for total in report.get('data', {}).get('totals', []):
-            json_data['total'] = total.get('values')[0]
+        for metricHeader, total in zip(metric_headers, report.get('data', {}).get('totals', [])[0].get('values', [])):
+            if metricHeader.get('name') == 'ga:users':
+                json_data['user_count'] = total
+            elif metricHeader.get('name') == 'ga:sessions':
+                json_data['session_count'] = total
+
+        json_data['country_count'] = len(report.get('data', {}).get('rows', []))
+        json_data['users_by_country'] = {}
+        json_data['sessions_by_country'] = {}
 
         for row in report.get('data', {}).get('rows', []):
 
             json_country = ""
-            json_value = -1
 
             dimensions = row.get('dimensions', [])
-            dateRangeValues = row.get('metrics', [])
+            date_range_values = row.get('metrics', [])
 
-            for header, dimension in zip(dimensionHeaders, dimensions):
+            for header, dimension in zip(dimension_headers, dimensions):
                 json_country = dimension
 
-            for i, values in enumerate(dateRangeValues):
-                for metricHeader, value in zip(metricHeaders, values.get('values')):
+            for i, values in enumerate(date_range_values):
+                for metricHeader, value in zip(metric_headers, values.get('values')):
                     json_value = value
-
-            json_data[json_country] = json_value
+                    if metricHeader.get('name') == 'ga:users':
+                        json_data['users_by_country'][json_country] = json_value
+                    elif metricHeader.get('name') == 'ga:sessions':
+                        json_data['sessions_by_country'][json_country] = json_value
 
     with open('/fs/website/people/fergus.cooper/google_analytics_data.json', 'w') as outfile:
         json.dump(json_data, outfile)
